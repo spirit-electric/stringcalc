@@ -1,0 +1,164 @@
+(ns stringcalc.core
+  (:require [clojure.math.numeric-tower :as math]))
+
+
+(defn- string->number [string]
+  (map read-string (clojure.string/split string #"(,|\n)")))
+
+(defn sum-a-string
+  "add two numbers separated by a comma"
+  [string]
+  (if (empty? string)
+    0
+    (reduce + (string->number string))))
+
+(defn penult [s]
+  (nth s (->  s
+              (count)
+              (dec)
+              (dec))))
+
+; more compact: #(second (reverse %))
+
+(defn nth_element [s n]
+  (loop [remainder s i 0]
+    (if (= i n)
+        (first remainder)
+        (recur  (rest remainder) (inc i)))))
+
+; more compact versions of nth_element
+;(fn [s n]
+;    (first (drop n s)))
+;
+;#((vec %1) %2)
+
+(defn s_len [s]
+  (loop [remainder s i 0]
+    (if (empty? remainder)
+        i
+        (recur (rest remainder) (inc i)))))
+
+;length of collection better!!
+; #(reduce + (map (fn [x] 1) %))
+
+;reverse a seq
+( #(into () %)  [[1 2][3 4][5 6]])
+
+;replicate a sequence element n times
+((fn [n s]
+   (reduce #(concat %1 (repeat n %2)) () s)) 3 [:a :b])
+(into () '((1 2 3) (4 5 6)))
+
+;list just odd
+(defn just_odd [s]
+  (filter #(> % 0) (map #(if(odd? %) % 0) s)))
+
+;; or using remove:
+(defn just_odd_2 [s]
+  (remove even? s))
+
+;; test for palindromia
+
+(defn palindrome? [s]
+  (loop [a (seq s) b (reverse (seq s)) i (quot (count a) 2)]
+    (if (not= (first a) (first b))
+      false
+      (if (zero? i)
+        true
+        (recur (rest a) (rest b) (dec i))))))
+
+; a very perfect version of palindrome queuery:
+( #(= (reverse %) (seq %)) "abba")
+
+;; fibonacci seq generator
+(defn fibo [n]
+  (let [f []]
+    (case n
+      0 (empty f)
+      1 (conj f 1)
+      2 (conj f 1 1)
+        (loop [i n s [1 1]]
+          (if (== i 2)
+           s
+           (recur (dec i) (conj s (+ (last s) (last (pop s))))))))))
+
+(defn fibon [n]
+  (loop [i 1 f [0 1]]
+    (if (== i n) (rest f)
+      (recur  (inc i) (conj f (+ (last f) (last (pop f))))))))
+
+(defn fibonn [n]
+  (loop [i 0, f [0 1]]
+    (if (= i n) (rest f)
+      (recur (inc i) (-> f pop pop + conj)))))
+
+(take 5 (iterate (fn [[x y]] [y (+ x y)]) [1 1]))
+
+; most ingenious clojureish sulution for fibonacci:
+( #(take % (map first (iterate (fn [[x y]] [y (+ x y)]) [1 1]))) 5)
+
+(fibonn 3)
+
+
+; find max the classical way
+(defn posintmax
+  [& items]
+  (loop [m items mx 0]
+    (if (= 1 (count m)) mx
+      (recur  (rest m) (if (> (first m) mx) (first m) mx)))))
+
+; only CAPS
+(defn CAPs [s]
+  (let [sascii (map int s)]
+    (apply str (map char (filter #(and (<=  % (int \Z)) (>= % (int \A))) sascii)))))
+
+; duplicate each element of a sequence
+(defn dups1 [v]
+  (loop [e v r '()]
+    (if(empty? e)
+      r
+      (recur (pop e) (conj r (peek e) (peek e))))))
+
+(defn dups [v]
+  (interleave v v))
+
+; generate a range of ints
+(defn intrange [lo hi]
+  (loop [i lo r []]
+    (if (== i hi) (seq r)
+      (recur (inc i) (conj r i)))))
+
+; compress a sequence
+(defn comps-1 [q]
+  (let [a (map first (partition-by identity q))]
+    (if (string? q) (apply str a) a)))
+
+(defn comps [q]
+ (loop [a (seq q) b [(first q)]]
+   (if (empty? a)
+     (seq b)
+     (recur (rest a) (if-not(= (first a) (last b)) (conj b (first a)) b)))))
+   
+; factorial
+(defn fact [n]
+  (reduce * (range 1 (inc n))))
+
+
+; interleave two seqs
+(defn ilv [c1 c2]
+  (flatten (map #(seq [%1 %2]) c1 c2)))
+
+; flatten
+(defn fltn-1 [col]
+    (loop [srccol col flatcol []]
+      (if (empty? srccol)
+        flatcol
+           (if (seq? (first srccol))
+              (first srccol (conj flatcol (fltn (first srccol)))) 
+              (recur (rest srccol) (conj flatcol (first srccol)))))))
+
+
+(reduce [1 2 3])
+  
+(#() [[1 2] 3])
+

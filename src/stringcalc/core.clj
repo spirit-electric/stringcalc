@@ -1,14 +1,16 @@
-(ns stringcalc.core)
-
-(defn- string->number [string]
-  (map read-string (clojure.string/split string #"(,|\n)")))
+(ns stringcalc.core
+  (:require [clojure.math.numeric-tower :as math]))
 
 
 
-(defn sum-a-string
-  "add two numbers separated by a comma"
-  [string]
-  (if (empty? string)
-    0
-    (reduce + (string->number string))))
+; flatten
+(defn flatit [col]
+    (loop [srccol col flatcol []]
+      (if (empty? srccol)
+        flatcol
+           (if (seq? (first srccol))
+              (first srccol (conj flatcol (flatit (first srccol)))) 
+              (recur (rest srccol) (conj flatcol (first srccol)))))))
+
+
 
