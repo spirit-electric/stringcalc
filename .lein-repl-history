@@ -1,0 +1,14 @@
+(ns 'stringcalc.core)
+quit
+vim
+quit
+(pst)
+(ns 'stringcalc.core)
+#spy/d (+ 2 4)
+(fibo 3)
+(ns 'stringcalc.core)
+(use 'stringcalc.core)
+(fibo 3)
+#spy/d (fibo 3)
+(fibo 3)
+(use 'stringcalc.core)
